@@ -1,6 +1,6 @@
-edges = {}
-nodes = set()
 def de_bruijn_ize(st, k):
+    edges = {}
+    nodes = set()
     for i in range(len(st) - k +1):
         kmer1 = st[i:i+k-1]
         kmer2 = st[i+1:i+k]
@@ -10,9 +10,7 @@ def de_bruijn_ize(st, k):
 
         nodes.add(st[i:i+k-1])
         nodes.add(st[i+1:i+k])
-    if 'INITIAL' not in edges:
-        edges['INITIAL'] = []
-    edges['INITIAL'].append(st[:k - 1])
+    edges['INITIAL'] = [st[:k-1]]
     for node in nodes:
         if node not in edges:
             edges[node] = []
@@ -23,7 +21,6 @@ trail = []
 
 def dfs(curNode, edges, initial):
     visited.add(curNode)
-    #print(curNode, edges[curNode])
     while curNode in edges and edges[curNode]:
         nextNode = edges[curNode].pop()
         dfs(nextNode, edges, False)
@@ -43,17 +40,13 @@ def listToString(fragments):
     return st
 
 #st = 'ACTAGAGTTTTTTTGAT'
-#st = input('/')
-final = 'ACTGATTGA'
-st1 = 'ACTGAT'
-st2 = 'TGATTGA'
-de_bruijn_ize(st1, 4)
-de_bruijn_ize(st2, 4)
+st = input('/')
+nodes, edges = de_bruijn_ize(st, 7)
 print(nodes)
 print(edges)
 topoSort(nodes, edges)
 print(trail)
-print(final)
+print(st)
 built = listToString(trail)
 print(built)
-print('Equal:', final == built)
+print('Equal:', st == built)
