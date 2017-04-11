@@ -3,7 +3,8 @@
   - [x] Assemble a single string
   - [x] Assemble multiple strings
   - [ ] Clean code (Everything is pretty messy)
-  - [ ] Classify everything into classes
+  - [x] Classify everything into classes
   - [ ] Add online assembly
+  - [ ] Add comments
   - [ ] Add i/o compatibility
   - [ ] Tons of tests
