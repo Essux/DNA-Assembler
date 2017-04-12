@@ -1,22 +1,35 @@
 from deBruijn import deBruijn_Graph
-final = input('/')
-k = int(input('Type k (for the kmers):'))
-reads = int(input('Type the number of reads to be simulated:'))
-graph = deBruijn_Graph(k)
-import random
-for i in range(0, reads):
-    rand1= random.randint(0, len(final) - k)
-    rand2 = random.randint(rand1+k, len(final))
-    graph.add_string_to_graph(final[rand1:rand2])
-    print('Read', i+1, final[rand1:rand2])
+import sys
+sys.setrecursionlimit(10000)
 
-import copy
+with open("AB042837ADN.txt", mode='r') as file:
+    final = file.readline()
+
+k = int(input('Type k (for the kmers):'))
+graph = deBruijn_Graph(k)
+i = 0
+
+with open("AB042837ADN-segments.txt", mode='r') as file:
+    length = int(file.readline())
+    file.readline()
+
+    while (len(graph.string) < length):
+        i += 1
+        nextst = file.readline()[:-1]
+        file.readline()
+        if i % 250 == 0:
+            print('Read', i)
+            print('Read length:', len(nextst))
+            print('Assembled length', len(graph.string))
+        graph.add_string_to_graph(nextst)
+        graph.getString()
+
 #print('Nodes:', nodes)
-print('Edges:', graph.edges)
+#print('Edges:', graph.edges)
 #print('Kmers', kmers)
-built = graph.getString(graph.nodes)
-print('Trail:', graph.trail)
-print(final)
-print(built)
+built = graph.getString()
+#print('Trail:', graph.trail)
+#print(final)
+#print(built)
 print('Equal:', final == built)
-graph.graphvizExport()
+#graph.graphvizExport()

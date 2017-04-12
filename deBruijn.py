@@ -12,6 +12,7 @@ class deBruijn_Graph:
         self.kmers = set()
         self.visited = set()
         self.trail = []
+        self.string = ""
 
     def add_string_to_graph(self, st):
         # If the initial kmer hasn't been already seen and k-1mer isn't in the graph
@@ -30,6 +31,7 @@ class deBruijn_Graph:
                 self.kmers.add(kmer)
                 kmer1 = st[i:i+self.k-1]
                 kmer2 = st[i+1:i+self.k]
+
                 if kmer1 not in self.edges.keys():
                     self.edges[kmer1] = []
                 self.edges[kmer1].append(kmer2)
@@ -41,31 +43,44 @@ class deBruijn_Graph:
                 self.nodes.add(st[i:i+self.k-1])
                 self.nodes.add(st[i+1:i+self.k])
 
-        """for node in self.nodes:
+        for node in self.nodes:
             if node not in self.edges:
-                self.edges[node] = []"""
+                self.edges[node] = []
         return self.nodes, self.edges
 
     def _dfs(self, curNode):
-        self.visited.add(curNode)
+        #self.visited.add(curNode)
         while curNode in self.edges and self.edges[curNode]:
             nextNode = self.edges[curNode].pop()
             self._dfs(nextNode)
         self.trail.append(curNode)
 
-    def getString(self, nodes):
+    def getString(self):
         edges2 = copy.deepcopy(self.edges)
         for initialnode in self.edges['INITIAL']:
-            if self.edges[initialnode] and initialnode not in self.visited:
+            # if self.edges[initialnode] and initialnode not in self.visited:            
+            if self.edges[initialnode]:
                 self._dfs(initialnode)
         self.trail.reverse()
         self.edges = copy.deepcopy(edges2)
         return self._listToString()
 
-    def _listToString(self):
+    """def _listToString(self):
+        if (not self.trail):
+            return ""
         st = self.trail.pop(0)
         while self.trail:
             st += self.trail.pop(0)[-1]
+        self.string = st
+        return st"""
+
+    def _listToString(self):
+        if (not self.trail):
+            return ""
+        st = self.trail.pop(0)
+        while self.trail:
+            st += self.trail.pop(0)[-1]
+        self.string = st
         return st
 
     def graphvizExport(self):

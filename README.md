@@ -6,5 +6,5 @@
   - [x] Classify everything into classes
   - [ ] Add online assembly
   - [ ] Add comments
-  - [ ] Add i/o compatibility
+  - [x] Add i/o compatibility
   - [ ] Tons of tests
