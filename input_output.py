@@ -1,15 +1,15 @@
 from deBruijn import deBruijn_Graph
-import sys
-sys.setrecursionlimit(10000)
+from time import clock
 
-with open("AB042837ADN.txt", mode='r') as file:
+with open("AY325307ADN.txt", mode='r') as file:
     final = file.readline()
 
 k = int(input('Type k (for the kmers):'))
 graph = deBruijn_Graph(k)
 i = 0
 
-with open("AB042837ADN-segments.txt", mode='r') as file:
+t0 = clock()
+with open("AY325307ADN-segments.txt", mode='r') as file:
     length = int(file.readline())
     file.readline()
 
@@ -17,19 +17,16 @@ with open("AB042837ADN-segments.txt", mode='r') as file:
         i += 1
         nextst = file.readline()[:-1]
         file.readline()
-        if i % 250 == 0:
+        graph.add_string_to_graph(nextst)        
+        if i % 15 == 0:
             print('Read', i)
             print('Read length:', len(nextst))
+            graph.getString()
             print('Assembled length', len(graph.string))
-        graph.add_string_to_graph(nextst)
-        graph.getString()
+            #print(graph.string in final)
+t1 = clock()-t0
 
-#print('Nodes:', nodes)
-#print('Edges:', graph.edges)
-#print('Kmers', kmers)
+print('Required reads:', i)
 built = graph.getString()
-#print('Trail:', graph.trail)
-#print(final)
-#print(built)
 print('Equal:', final == built)
-#graph.graphvizExport()
+print('Time used:', t1, 'seg')

@@ -15,6 +15,8 @@ class deBruijn_Graph:
         self.string = ""
 
     def add_string_to_graph(self, st):
+        if len(st)<self.k:
+            return
         # If the initial kmer hasn't been already seen and k-1mer isn't in the graph
         # the k-1mer is the beginning of a string
         if st[:self.k] not in self.kmers and st[:self.k-1] not in self.edges:
@@ -46,33 +48,27 @@ class deBruijn_Graph:
         for node in self.nodes:
             if node not in self.edges:
                 self.edges[node] = []
-        return self.nodes, self.edges
 
     def _dfs(self, curNode):
-        #self.visited.add(curNode)
-        while curNode in self.edges and self.edges[curNode]:
-            nextNode = self.edges[curNode].pop()
-            self._dfs(nextNode)
-        self.trail.append(curNode)
+        stack = []
+        stack.append(curNode)
+        self.visited.add(curNode)
+        while len(stack) > 0:
+            curNode = stack.pop()
+            for node in self.edges[curNode]:
+                if node not in self.visited:
+                    self.visited.add(node)
+                    stack.append(node)
+            self.trail.append(curNode)
 
     def getString(self):
         edges2 = copy.deepcopy(self.edges)
-        for initialnode in self.edges['INITIAL']:
-            # if self.edges[initialnode] and initialnode not in self.visited:            
-            if self.edges[initialnode]:
-                self._dfs(initialnode)
-        self.trail.reverse()
+        initialnode = self.edges['INITIAL'][0]
+        if self.edges[initialnode]:
+            self.visited = set()
+            self._dfs(initialnode)
         self.edges = copy.deepcopy(edges2)
         return self._listToString()
-
-    """def _listToString(self):
-        if (not self.trail):
-            return ""
-        st = self.trail.pop(0)
-        while self.trail:
-            st += self.trail.pop(0)[-1]
-        self.string = st
-        return st"""
 
     def _listToString(self):
         if (not self.trail):
