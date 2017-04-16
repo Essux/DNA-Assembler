@@ -1,7 +1,9 @@
 import copy
-
 class deBruijn_Graph:
+    'Class used to build de Bruijn graph with the k-mers'
     def __init__(self, k):
+        """@Parameter k: It's an interger value that represents the k-mers length
+        Method used to initialize the class' attributes"""
         # Size of the k-mers
         self.k = k
         # Dictionary. Key: Parent node. Value: List of succesors 
@@ -15,6 +17,8 @@ class deBruijn_Graph:
         self.string = ""
 
     def add_string_to_graph(self, st):
+        """@Parameter st: It's a string that contains the segment of DNA
+        This method builds and adds the string's k-mers to the graph""" 
         if len(st)<self.k:
             return
         # If the initial kmer hasn't been already seen and k-1mer isn't in the graph
@@ -50,6 +54,9 @@ class deBruijn_Graph:
                 self.edges[node] = []
 
     def _dfs(self, curNode):
+        """@Parameter curNode: It is a node of graph where the dfs starts'
+        'This method travels the graph in dfs from curNode to its successors to build'
+        'the trail of the DNA"""
         stack = []
         stack.append(curNode)
         self.visited.add(curNode)
@@ -62,6 +69,7 @@ class deBruijn_Graph:
             self.trail.append(curNode)
 
     def getString(self):
+        """This method calls dfs and _listToString to build the string with the k-mers"""
         edges2 = copy.deepcopy(self.edges)
         initialnode = self.edges['INITIAL'][0]
         if self.edges[initialnode]:
@@ -71,6 +79,8 @@ class deBruijn_Graph:
         return self._listToString()
 
     def _listToString(self):
+        """This method concatenates the trail of the graph into a string representing the DNA
+        sequence"""
         if (not self.trail):
             return ""
         st = self.trail.pop(0)
@@ -80,6 +90,7 @@ class deBruijn_Graph:
         return st
 
     def graphvizExport(self):
+        'This method shows the shape of deBruijn graph'
         text = ""
         text += "digraph deBruijn {\n"
         text += "node [shape = circle];\n"
