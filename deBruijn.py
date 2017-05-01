@@ -1,4 +1,6 @@
 import copy
+from collections import deque
+
 class deBruijn_Graph:
     'Class used to build de Bruijn graph with the k-mers'
     def __init__(self, k):
@@ -12,15 +14,18 @@ class deBruijn_Graph:
         self.nodes = set()
         # Set of k-mers
         self.kmers = set()
-        self.visited = set()
-        self.trail = []
+        #self.visited = set()
+        self.trail = deque()
         self.string = ""
 
     def add_string_to_graph(self, st):
         """@Parameter st: It's a string that contains the segment of DNA
         This method builds and adds the string's k-mers to the graph""" 
+
+        # If the read size is less than the k-mer size, dicard it
         if len(st)<self.k:
             return
+
         # If the initial kmer hasn't been already seen and k-1mer isn't in the graph
         # the k-1mer is the beginning of a string
         if st[:self.k] not in self.kmers and st[:self.k-1] not in self.edges:
@@ -54,38 +59,40 @@ class deBruijn_Graph:
                 self.edges[node] = []
 
     def _dfs(self, curNode):
-        """@Parameter curNode: It is a node of graph where the dfs starts'
-        'This method travels the graph in dfs from curNode to its successors to build'
-        'the trail of the DNA"""
+        """ @Parameter curNode: It is a node of graph where the dfs starts
+            This method travels the graph in dfs from curNode to its successors to build
+            the trail of the DNA"""
         stack = []
         stack.append(curNode)
-        self.visited.add(curNode)
+        #self.visited.add(curNode)
         while len(stack) > 0:
             curNode = stack.pop()
-            for node in self.edges[curNode]:
+            """for node in self.edges[curNode]:
                 if node not in self.visited:
                     self.visited.add(node)
-                    stack.append(node)
+                    stack.append(node)"""
+            if self.edges[curNode]:
+                stack.append(self.edges[curNode][0])
             self.trail.append(curNode)
 
     def getString(self):
         """This method calls dfs and _listToString to build the string with the k-mers"""
-        edges2 = copy.deepcopy(self.edges)
+        #edges2 = copy.deepcopy(self.edges)
         initialnode = self.edges['INITIAL'][0]
         if self.edges[initialnode]:
             self.visited = set()
             self._dfs(initialnode)
-        self.edges = copy.deepcopy(edges2)
+        #self.edges = copy.deepcopy(edges2)
         return self._listToString()
 
     def _listToString(self):
         """This method concatenates the trail of the graph into a string representing the DNA
         sequence"""
-        if (not self.trail):
+        if not self.trail:
             return ""
-        st = self.trail.pop(0)
+        st = self.trail.popleft()
         while self.trail:
-            st += self.trail.pop(0)[-1]
+            st += self.trail.popleft()[-1]
         self.string = st
         return st
 
