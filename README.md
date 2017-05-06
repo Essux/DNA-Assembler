@@ -7,5 +7,5 @@
   - [x] Add online assembly
   - [x] Add comments
   - [x] Add i/o compatibility
-  - [ ] Tons of tests
-  - [ ] Add gene extraction
+  - [x] Tons of tests
+  - [x] Add gene extraction
