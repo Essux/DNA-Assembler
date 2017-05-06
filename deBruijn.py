@@ -1,5 +1,8 @@
 import copy
 from collections import deque
+from re import findall
+import re
+from subprocess import call
 
 class deBruijn_Graph:
     'Class used to build de Bruijn graph with the k-mers'
@@ -16,7 +19,8 @@ class deBruijn_Graph:
         self.kmers = set()
         #self.visited = set()
         self.trail = deque()
-        self.string = ""
+        self.strings = []
+        self.genes = set()
 
     def add_string_to_graph(self, st):
         """@Parameter st: It's a string that contains the segment of DNA
@@ -65,7 +69,7 @@ class deBruijn_Graph:
         stack = []
         stack.append(curNode)
         #self.visited.add(curNode)
-        while len(stack) > 0:
+        while stack:
             curNode = stack.pop()
             """for node in self.edges[curNode]:
                 if node not in self.visited:
@@ -77,13 +81,12 @@ class deBruijn_Graph:
 
     def getString(self):
         """This method calls dfs and _listToString to build the string with the k-mers"""
-        #edges2 = copy.deepcopy(self.edges)
-        initialnode = self.edges['INITIAL'][0]
-        if self.edges[initialnode]:
-            self.visited = set()
-            self._dfs(initialnode)
-        #self.edges = copy.deepcopy(edges2)
-        return self._listToString()
+        self.strings = []
+        for initialnode in self.edges['INITIAL']:
+            if self.edges[initialnode]:
+                self.visited = set()
+                self._dfs(initialnode)
+                self.strings.append(self._listToString())
 
     def _listToString(self):
         """This method concatenates the trail of the graph into a string representing the DNA
@@ -91,20 +94,31 @@ class deBruijn_Graph:
         if not self.trail:
             return ""
         st = self.trail.popleft()
-        while self.trail:
-            st += self.trail.popleft()[-1]
-        self.string = st
+        for a in self.trail:
+            st += a[-1]
+        self.trail = deque()
         return st
 
-    def graphvizExport(self):
+    def graphvizExport(self, filename="deBruijn", render=False):
         'This method shows the shape of deBruijn graph'
-        text = ""
-        text += "digraph deBruijn {\n"
-        text += "node [shape = circle];\n"
-        for f in self.edges.keys():
-            for t in self.edges[f]:
-                text += str(f) + " -> " + str(t) + '\n'
-        text += "}"
-
-        with open("deBruijn.dot", encoding='utf-8', mode='w') as file:
-            file.write(text)
+        with open(filename + ".dot", encoding='utf-8', mode='w') as file:
+            file.write("digraph deBruijn {\n")
+            file.write("node [shape = circle];\n")
+            for f in self.edges.keys():
+                for t in self.edges[f]:
+                    file.write(str(f) + " -> " + str(t) + '\n')
+            file.write("}")
+        
+        if render:
+            call(["dot", filename + ".dot", "-Tpng", "-o", filename + ".png"])
+    
+    def getGenes(self):
+        """This method retrieves all the genes contained in the current built strings"""
+        self.getString()
+        regexp = '(ATG(...)*?(TAA|TGA|TAG))'
+        for substr in self.strings:
+            matches = findall(regexp, substr, re.I)
+            for match in matches:
+                if match[0] not in self.genes:
+                    print("Gene " + str(len(self.genes)+1), match[0])
+                    self.genes.add(match[0])

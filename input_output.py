@@ -1,33 +1,35 @@
 from deBruijn import deBruijn_Graph
 from time import clock
+from sys import argv
 
-with open("AY325307ADN.txt", mode='r') as file:
-    final = file.readline()
+filename = argv[1]
 
-k = int(input('Type k (for the kmers):'))
+k = 200
 graph = deBruijn_Graph(k)
 i = 0
 
 t0 = clock()
-with open("AY325307ADN-segments.txt", mode='r') as file:
+
+with open(filename + "ADN-segments.txt", mode='r') as file:
     length = int(file.readline())
     file.readline()
 
-    while (len(graph.edges) + 1 < (len(final) - k +1)):    
+    while (len(graph.kmers) < length - k +1):
         i += 1
         nextst = file.readline()[:-1]
         file.readline()
         graph.add_string_to_graph(nextst) 
-        if i % 15 == 0:
-            print('Read', i)
-            print('Read length:', len(nextst))
-            print('Assembled length', len(graph.string))
+        graph.getGenes()
+
 t1 = clock()-t0
 
 print()
-print('-'*30)
+print('-'*45)
 print('Required reads:', i)
-built = graph.getString()
-print('Equal:', final == built)
-print('Time used:', t1, 'seg')
-print('-'*30)
+built = graph.strings[0]
+original = open(filename + "ADN.txt", mode='r').readline()
+print('String correctness:', built == original)
+print('Time used:', "{0:.3f}".format(t1), 'seg')
+print('String length:', str(sum([len(stt) for stt in graph.strings])) + '/' + str(length))
+print("Found", len(graph.genes), 'genes')
+print('-'*45)

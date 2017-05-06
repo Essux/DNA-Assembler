@@ -1,32 +1,34 @@
 from deBruijn import deBruijn_Graph
 import random
 
-final = input('/')
+original = input('/')
+length = len(original)
 k = int(input('Type k (for the kmers):'))
 graph = deBruijn_Graph(k)
 
 i = 0
-while (len(graph.string) < len(final)):
+built = ""
+while (len(graph.kmers) < len(original) - (k-1)):
     i += 1
-    rand1= random.randint(0, len(final)-k)
+    rand1= random.randint(0, length-k)
     try:
-        rand2 = random.randint(rand1+k, rand1 + 30 if rand1 + 30 < len(final) else len(final))
-        read = final[rand1:rand2]
+        rand2 = random.randint(rand1+k, rand1 + max(10, k) if rand1 + max(10, k+1) < length else length)
+        read = original[rand1:rand2]
         graph.add_string_to_graph(read)
-        st = graph.getString()
-        print('Size:', len(read))
-        if i % 10 == 0:
-            print('Read', i, read)
-            print('Edges', graph.edges)
-            print (st)
+        graph.getString()
+        built = graph.strings[0]
+        if i % 15 == 0:
+            print('Read', i, end='  ')
+            print('Built:', len(built))
+            graph.graphvizExport("Read"+str(i), True)
     except ValueError:
-        print('Failed Read')
         i-=1
-
+graph.getString()
 
 print("Required reads", i)
-built = graph.getString()
-print(final)
+print('Kmers', len(graph.kmers))
+built = graph.strings[0]
+print('Length', len(original))
+print(original)
 print(built)
-print('Equal:', final == built)
-graph.graphvizExport()
+print('Equal:', original == built)
